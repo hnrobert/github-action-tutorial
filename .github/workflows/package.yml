@@ -20,13 +20,10 @@ jobs:
         with:
           python-version: "3.11"
 
-      # Exercise 1: Implement dependency installation here
       - name: Install deps
         run: |
           python -m pip install --upgrade pip
-          echo "TODO: Achieve pip requirements installation over here"
-
-      # Remember to add a -n parameter to name the output binary appropriately for each platform
+          pip install -r requirements.txt
       - name: Build with PyInstaller (macOS arm64)
         run: |
           pyinstaller --onefile app/hello.py -n hello-macos-arm64
@@ -48,25 +45,19 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: "3.11"
-
       - name: Install deps
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-
-      # Exercise 2: Implement Windows build steps here
-      # You can refer to the macOS build steps above for guidance
-      # - name: Build with PyInstaller (Windows x64)
-      #   ...
-
+      - name: Build with PyInstaller (Windows x64)
+        shell: pwsh
+        run: |
+          pyinstaller --onefile app/hello.py -n hello-windows-x64
       - name: Debug dist
         shell: pwsh
         run: dir dist || true
-
-      # Exercise 3: Implement artifact upload here
-      # - name: Upload Windows artifact
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: hello-windows-x64
-      #     path: # TODO: Specify the path to the Windows build artifact here.
-      # it is a file with .exe extension named by you under `dist/`, generated in Exercise 2
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: hello-windows-x64
+          path: dist/hello-windows-x64.exe
