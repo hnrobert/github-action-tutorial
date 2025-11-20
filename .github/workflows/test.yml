@@ -1,0 +1,39 @@
+name: CI — Test & Lint
+
+on:
+  push:
+    branches: [main]
+  pull_request: # Also trigger on pull requests to main as a checking mechanism
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the repository - Add this step at the beginning of the steps to help the Job access the code
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+      
+      # Set up Python environment - Automatically install Python for the job efficiently
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      # Install dependencies - Install the required packages for testing and linting
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # Run linting - Check code style using autopep8
+      - name: Run autopep8 check
+        run: |
+          pip install autopep8
+          autopep8 --diff --recursive app tests
+
+      # Run tests - Execute the test suite using pytest. If everything passes, the job will succeed, else it will fail and report the issues
+      - name: Run tests
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: pytest -q
